@@ -1,4 +1,4 @@
-package app.chat_app_server;
+package app.chat_app_server.gui;
 
 import app.chat_app_server.gui.LogStage;
 import javafx.application.Application;
@@ -13,7 +13,7 @@ public class ServerApp extends Application {
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main() {
         launch();
     }
 }

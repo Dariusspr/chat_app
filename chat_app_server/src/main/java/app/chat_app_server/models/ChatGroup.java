@@ -42,6 +42,7 @@ public class ChatGroup {
     public void addMessage(Message message) {
         messages.add(message);
     }
+
     public void sendMessage(Message message) {
         for (User user : activeUsers) {
             Client client = user.getClient();
@@ -61,6 +62,10 @@ public class ChatGroup {
         }
     }
 
+    public int getMemberSize() {
+        return activeUsers.size();
+    }
+
     public ArrayList<Message> getMessages() {
         return this.messages;
     }
@@ -72,5 +77,13 @@ public class ChatGroup {
 
     public String getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

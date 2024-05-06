@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Service {
     private static final int THREAD_COUNT = 15;
@@ -17,7 +18,6 @@ public class Service {
 
     private ServerSocket serverSocket;
     private final ExecutorService threadPool;
-    private boolean isRunning = true;
 
     private Service() {
         threadPool = Executors.newFixedThreadPool(THREAD_COUNT);
@@ -30,22 +30,23 @@ public class Service {
     public void start() {
         try {
             serverSocket = new ServerSocket(PORT_NUM);
-            while (isRunning) {
+            while (!serverSocket.isClosed()) {
                 Socket connectionSocket = serverSocket.accept();
-
                 Client client = new Client(connectionSocket);
-
                 threadPool.execute(client);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            if (!serverSocket.isClosed()) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void stop() {
         try {
-            isRunning = false;
             serverSocket.close();
+            threadPool.shutdown();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

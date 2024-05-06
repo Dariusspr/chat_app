@@ -14,22 +14,34 @@ public class GroupManager {
     private ArrayList<ChatGroup> groups;
     private ChatGroup globalGroup;
 
-    private GroupManager() {
-            globalGroup = new ChatGroup(GLOBAL_GROUP);
-            globalGroup.setId(GLOBAL_GROUP_ID);
+    private GroupManager() {}
 
-            groups = new ArrayList<>();
-    }
-
-    public void loadData(ArrayList<ChatGroup> groups, ChatGroup globalGroup) {
-        this.globalGroup = globalGroup;
+    public void loadData(ArrayList<ChatGroup> groups) {
         this.groups = groups;
+        globalGroup = findGlobal();
+        if (globalGroup == null) {
+            initGlobal();
+        }
     }
 
     public static GroupManager getInstance() {
         return groupManager == null ? groupManager = new GroupManager() : groupManager;
     }
 
+    private ChatGroup findGlobal() {
+        for (ChatGroup group : groups) {
+            if (group.getId().equals(GLOBAL_GROUP_ID)) {
+                return group;
+            }
+        }
+        return null;
+    }
+
+    public void initGlobal() {
+        globalGroup = new ChatGroup(GLOBAL_GROUP);
+        globalGroup.setId(GLOBAL_GROUP_ID);
+        groups.add(globalGroup);
+    }
 
     public ChatGroup createGroup(String name) {
         ChatGroup group = new ChatGroup(name);
@@ -77,4 +89,7 @@ public class GroupManager {
         }
     }
 
+    public ArrayList<ChatGroup> getGroups() {
+        return groups;
+    }
 }

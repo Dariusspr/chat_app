@@ -6,6 +6,8 @@ import app.chat_app_server.micro.UserManager;
 import java.io.*;
 import java.net.Socket;
 
+import static app.chat_app_server.fileIO.DataSaver.MESSAGE_DELIMITER;
+
 public class Client implements  Runnable{
     private Socket clientSocket;
 
@@ -15,10 +17,6 @@ public class Client implements  Runnable{
     private BufferedReader in;
 
     private User connectedUser;
-
-    private static final String REQ_DELIMITER = "&&";
-    private String rawMessage;
-
 
     private boolean isRunning = true; // todo: running only if successfully logged in
 
@@ -36,52 +34,72 @@ public class Client implements  Runnable{
     }
 
 
-    private void get() {
-        new Thread(() -> {
-            try {
-                while(isRunning) {
-                    rawMessage = null;
+//    private void get() {
+//        new Thread(() -> {
+//            try {
+//                while(isRunning) {
+//                    rawMessage = null;
+//
+//                    rawMessage = in.readLine();
+//
+//                    if (rawMessage == null) {
+//                        continue;
+//                    }
+//                    System.out.println("Server received: " + rawMessage);
+//                }
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }).start();
+//    }
 
-                    rawMessage = in.readLine();
-
-                    if (rawMessage == null) {
-                        continue;
-                    }
-                    System.out.println("Server received: " + rawMessage);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    private void send() {
+    private void reply() throws IOException {
         while(isRunning) {
-            if (rawMessage != null) {
-                String[] splitMessage = rawMessage.split(REQ_DELIMITER);
-                String response = getResponse(splitMessage);
-                System.out.println("Server sent: " + response);
-                out.println(response);
+            String rawMessage = null;
+
+            rawMessage = in.readLine();
+            if (rawMessage == null) {
+                continue;
             }
+
+            System.out.println("Server received: " + rawMessage);
+            String[] splitMessage = rawMessage.split(MESSAGE_DELIMITER);
+            String response = getResponse(splitMessage);
+            System.out.println("Server sent: " + response);
+            out.println(response);
         }
     }
 
     @Override
     public void run() {
         try {
+            reply();
 
-            get();
-            send();
-
-            in.close();
-            out.close();
-            inputStream.close();
-            outputStream.close();
-            clientSocket.close();
         } catch (EOFException e) {
             System.out.println("Closed");
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            try {
+                if (in != null) {
+                    in.close();
+                }
+                if (out != null) {
+                    out.close();
+                }
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+                if (clientSocket != null) {
+                    clientSocket.close();
+                }
+            } catch (IOException e) {
+                // Handle any exceptions that occur during cleanup
+                e.printStackTrace();
+            }
         }
     }
 
@@ -119,7 +137,7 @@ public class Client implements  Runnable{
                 isRunning = false;
                 return "success";
             }
-            case "create_private_chat" -> { // ["create_private_chat", "other_user_name"]
+            case "create_two_group" -> { // ["create_two_group", "other_user_name"]
                 User otherUser = userManager.getUser(splitMessage[1]);
                 if (otherUser == null) {
                     return "invalid";
@@ -135,11 +153,26 @@ public class Client implements  Runnable{
                 connectedUser.addMemberOf(group.getId());
                 return "success";
             }
+            case "leave_two_group" -> { // ["leave_two_group", "other_user_name", "group_id"]
+                User otherUser = userManager.getUser(splitMessage[1]);
+                ChatGroup group = groupManager.getGroup(splitMessage[2]);
+                if (group == null || otherUser == null) {
+                    return "invalid";
+                }
+                otherUser.removeMemberOf(group.getId());
+                connectedUser.removeMemberOf(group.getId());
+
+                group.removeUser(connectedUser);
+                group.removeUser(otherUser);
+                groupManager.removeGroup(group.getId());
+
+                return "success";
+            }
             case "create_group" -> { // ["create_group", group_name]
                 ChatGroup group = groupManager.createGroup(splitMessage[1]);
                 group.addUser(connectedUser);
                 connectedUser.addMemberOf(group.getId());
-                return "success" + REQ_DELIMITER + group.getId();
+                return "success" + MESSAGE_DELIMITER + group.getId();
             }
             case "join_group" -> { // ["join_group", "group_id"]
                 ChatGroup group = groupManager.getGroup(splitMessage[1]);
@@ -157,6 +190,11 @@ public class Client implements  Runnable{
                 }
                 group.removeUser(connectedUser);
                 connectedUser.removeMemberOf(group.getId());
+
+                if (group.getMemberSize() == 0) {
+                    groupManager.removeGroup(group.getId());
+                }
+
                 return "success";
             }
             case "message" -> { // [ "message", "group_id", "content"]
@@ -175,7 +213,7 @@ public class Client implements  Runnable{
 
 
     public void sendMessage(Message message) {
-        out.println("message" + REQ_DELIMITER + message.getSender() + REQ_DELIMITER + message.getContent());
+        out.println("message" + MESSAGE_DELIMITER + message.getSender() + MESSAGE_DELIMITER + message.getContent());
     }
 
     public User getConnectedUser() {

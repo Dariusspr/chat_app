@@ -1,6 +1,6 @@
 package app.chat_app_server.gui;
 
-import app.chat_app_server.ServerApp;
+import app.chat_app_server.Service;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -11,19 +11,17 @@ import java.io.IOException;
 
 public class LogStage extends Stage {
     private static LogStage stage;
-    private LogController serverController;
     private LogStage() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(ServerApp.class.getResource("log-view.fxml"));
             Scene scene = new Scene(fxmlLoader.load());
-            serverController = fxmlLoader.getController();
-            stage.setTitle("Server log");
-            stage.setScene(scene);
-            stage.setResizable(false);
+            this.setTitle("Server log");
+            this.setScene(scene);
+            this.setResizable(false);
 
-            stage.setOnCloseRequest(event -> {
+            this.setOnCloseRequest(event -> {
                 event.consume();
-                closeStage();
+                quit();
             });
         }
         catch (IOException e) {
@@ -34,7 +32,7 @@ public class LogStage extends Stage {
         return stage == null ? stage = new LogStage() : stage;
     }
 
-    private void closeStage() {
+    private void quit() {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit");
         alert.setHeaderText("You're about to turn off the server");
@@ -42,6 +40,7 @@ public class LogStage extends Stage {
 
         var result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
+            Service.getInstance().stop();
             this.close();
         }
     }
