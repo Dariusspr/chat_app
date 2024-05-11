@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.chat_app_client.controller.NewGroupController">
+   <children>
+      <Button fx:id="btnSmall" layoutX="55.0" layoutY="187.0" mnemonicParsing="false" onMouseClicked="#onClickSmall" text="With existing user">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnLarge" layoutX="299.0" layoutY="187.0" mnemonicParsing="false" onMouseClicked="#onClickLarge" prefHeight="39.0" prefWidth="229.0" text="New Private group">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Button>
+      <Label fx:id="labelInfo" layoutX="130.0" layoutY="123.0" text="Choose message room type">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <TextField fx:id="tfInput" layoutX="167.0" layoutY="131.0" promptText="Name" visible="false">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </TextField>
+      <Button fx:id="btnCreate" layoutX="181.0" layoutY="226.0" mnemonicParsing="false" onMouseClicked="#onClickCreate" prefHeight="39.0" prefWidth="208.0" text="Create" visible="false">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnExisting" layoutX="177.0" layoutY="252.0" mnemonicParsing="false" onMouseClicked="#onClickExisting" text="Join existing group">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Button>
+      <Button fx:id="btnBack" layoutX="18.0" layoutY="14.0" mnemonicParsing="false" onMouseClicked="#onClickBack" text="Back" visible="false">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Button>
+   </children>
+</AnchorPane>

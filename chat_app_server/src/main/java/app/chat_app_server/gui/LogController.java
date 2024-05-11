@@ -9,6 +9,6 @@ public class LogController {
     private TextArea taServerInfo;
 
     public void createMessage(String messageInfo) {
-        taServerInfo.appendText(CurrentTime.getCurrentTimeFormatted() + " " + messageInfo + "\n");
+        taServerInfo.appendText("[" +CurrentTime.getCurrentTimeFormatted() + "] " + messageInfo + "\n");
     }
 }

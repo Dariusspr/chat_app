@@ -1,6 +1,6 @@
-package app.chat_app_server.models;
+package app.chat_app_client;
 
-import static app.chat_app_server.fileIO.DataSaver.MESSAGE_DELIMITER;
+import static app.chat_app_client.ServerConnection.MESSAGE_DELIMITER;
 
 public class Message {
     private String sender;
@@ -32,6 +32,13 @@ public class Message {
         return sender + MESSAGE_DELIMITER + content;
     }
 
+    public String MessageFormat() {
+        if (LocalData.getInstance().getUsername().equals(sender)) {
+            return "ME: " + content;
+        }
+        return sender + ": " + content;
+    }
+
     public static Message parse(String line) {
         String[] splitLine = line.split(MESSAGE_DELIMITER);
         if (splitLine.length == 2) {
@@ -39,5 +46,4 @@ public class Message {
         }
         return null;
     }
-
 }

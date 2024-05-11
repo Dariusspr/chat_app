@@ -2,6 +2,8 @@ package app.chat_app_server.models;
 
 import java.util.ArrayList;
 
+import static app.chat_app_server.fileIO.DataSaver.MESSAGE_DELIMITER;
+
 public class User {
     private String name;
     private String password;
@@ -70,5 +72,9 @@ public class User {
 
     public Client getClient() {
         return client;
+    }
+
+    public boolean isMember(String id) {
+        return memberOf.contains(id);
     }
 }

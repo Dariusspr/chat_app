@@ -1,4 +1,4 @@
-package app.chat_app_server.gui;
+package app.chat_app_server;
 
 import app.chat_app_server.gui.LogStage;
 import javafx.application.Application;

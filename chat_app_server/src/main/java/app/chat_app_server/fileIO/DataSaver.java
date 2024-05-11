@@ -39,7 +39,12 @@ public class DataSaver {
                     users.add(new User(userData[0], userData[1]));
                     continue;
                 }
-                ArrayList<String> memberOf = new ArrayList<>(Arrays.asList(userData).subList(2, userData.length));
+                ArrayList<String> memberOf;
+                if (userData.length > 2) {
+                    memberOf = new ArrayList<>(Arrays.asList(userData).subList(2, userData.length));
+                } else {
+                    memberOf = new ArrayList<>();
+                }
                 users.add(new User(userData[0], userData[1], memberOf));
             }
         } catch (IOException e) {
@@ -73,23 +78,25 @@ public class DataSaver {
             return;
         }
         ArrayList<ChatGroup> groups = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(USERS_FILE_PATH))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(GROUPS_FILE_PATH))) {
             String line;
 
             while((line = reader.readLine()) != null) {
                 String name;
                 String id;
+                String type;
                 ArrayList<Message> messages = new ArrayList<>();
 
                 String[] groupData = line.split(DELIMITER);
                 name = groupData[0];
                 id = groupData[1];
+                type = groupData[2];
                 while ((line = reader.readLine()) != null && !line.equalsIgnoreCase(GROUP_DELIMITER)) {
                     String[] messageData = line.split(MESSAGE_DELIMITER);
                     messages.add(new Message(messageData[0], messageData[1]));
                 }
 
-                groups.add(new ChatGroup(name, id, messages));
+                groups.add(new ChatGroup(name, id, messages, type));
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -99,9 +106,9 @@ public class DataSaver {
 
     public void saveGroups() {
         ArrayList<ChatGroup> groups = groupManager.getGroups();
-        try(BufferedWriter writer = new BufferedWriter(new FileWriter(USERS_FILE_PATH))) {
+        try(BufferedWriter writer = new BufferedWriter(new FileWriter(GROUPS_FILE_PATH))) {
             for (ChatGroup group : groups) {
-                writer.write(group.getName() + DELIMITER + group.getId());
+                writer.write(group.getName() + DELIMITER + group.getId() + DELIMITER + group.getType());
                 writer.newLine();
                 for (Message message : group.getMessages()) {
                     writer.write(message.getSender() + MESSAGE_DELIMITER + message.getContent());

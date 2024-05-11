@@ -1,7 +1,9 @@
 package app.chat_app_server.micro;
 
 import app.chat_app_server.models.ChatGroup;
+import app.chat_app_server.models.Message;
 import app.chat_app_server.models.User;
+import app.chat_app_server.utils.CurrentTime;
 
 import java.util.ArrayList;
 
@@ -40,11 +42,16 @@ public class GroupManager {
     public void initGlobal() {
         globalGroup = new ChatGroup(GLOBAL_GROUP);
         globalGroup.setId(GLOBAL_GROUP_ID);
+        globalGroup.setType("large");
         groups.add(globalGroup);
     }
 
-    public ChatGroup createGroup(String name) {
+    public ChatGroup createGroup(String name, String type) {
         ChatGroup group = new ChatGroup(name);
+        if (type.equalsIgnoreCase("large")) {
+            group.setName(name);
+        }
+        group.setType(type);
         groups.add(group);
         return group;
     }

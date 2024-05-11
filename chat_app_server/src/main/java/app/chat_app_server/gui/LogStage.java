@@ -1,6 +1,8 @@
 package app.chat_app_server.gui;
 
+import app.chat_app_server.ServerApp;
 import app.chat_app_server.Service;
+import app.chat_app_server.fileIO.DataSaver;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -11,6 +13,7 @@ import java.io.IOException;
 
 public class LogStage extends Stage {
     private static LogStage stage;
+    private LogController controller;
     private LogStage() {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(ServerApp.class.getResource("log-view.fxml"));
@@ -18,7 +21,7 @@ public class LogStage extends Stage {
             this.setTitle("Server log");
             this.setScene(scene);
             this.setResizable(false);
-
+            controller = fxmlLoader.getController();
             this.setOnCloseRequest(event -> {
                 event.consume();
                 quit();
@@ -41,8 +44,16 @@ public class LogStage extends Stage {
         var result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             Service.getInstance().stop();
+            DataSaver dataSaver = new DataSaver();
+            dataSaver.saveUsers();
+            dataSaver.saveGroups();
+
             this.close();
         }
+    }
+
+    public LogController getController() {
+        return controller;
     }
 }
 

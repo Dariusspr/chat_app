@@ -4,9 +4,12 @@ import app.chat_app_server.utils.CurrentTime;
 
 import java.util.ArrayList;
 
+import static app.chat_app_server.fileIO.DataSaver.MESSAGE_DELIMITER;
+
 public class ChatGroup {
     private String id;
     private String name;
+    private String type = "large";
     private ArrayList<Message> messages;
     private ArrayList<User> activeUsers;
 
@@ -18,11 +21,13 @@ public class ChatGroup {
         messages = new ArrayList<>();
     }
 
-    public ChatGroup(String name, String id, ArrayList<Message> messages) {
+
+    public ChatGroup(String name, String id, ArrayList<Message> messages, String type) {
         this.name = name;
         this.id = id;
         activeUsers = new ArrayList<>();
         this.messages = messages;
+        this.type = type;
     }
 
 
@@ -43,10 +48,10 @@ public class ChatGroup {
         messages.add(message);
     }
 
-    public void sendMessage(Message message) {
+    public void sendAllMessage(Message message) {
         for (User user : activeUsers) {
             Client client = user.getClient();
-            client.sendMessage(message);
+            client.sendMessage(id, message);
             addMessage(message);
         }
     }
@@ -57,9 +62,12 @@ public class ChatGroup {
                 continue;
             }
             Client client = user.getClient();
-            client.sendMessage(message);
-            addMessage(message);
+            if (client == null) {
+                continue;
+            }
+            client.sendMessage(id, message);
         }
+        addMessage(message);
     }
 
     public int getMemberSize() {
@@ -85,5 +93,24 @@ public class ChatGroup {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getFormattedGroupData() {
+        StringBuilder data = new StringBuilder();
+        for (int i = 0; i < messages.size(); i++) {
+            if (i != 0) {
+                data.append(MESSAGE_DELIMITER);
+            }
+            data.append(messages.get(i).format());
+        }
+        return data.toString();
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getType() {
+        return type;
     }
 }

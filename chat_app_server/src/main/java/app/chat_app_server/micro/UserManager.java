@@ -4,6 +4,8 @@ import app.chat_app_server.models.User;
 
 import java.util.ArrayList;
 
+import static app.chat_app_server.micro.GroupManager.GLOBAL_GROUP_ID;
+
 public class UserManager {
     private static UserManager userManager;
     private ArrayList<User> users;
@@ -24,7 +26,7 @@ public class UserManager {
         }
         User user = new User(name, password);
         users.add(user);
-
+        user.addMemberOf(GLOBAL_GROUP_ID);
         return true;
     }
 

@@ -1,5 +1,6 @@
 package app.chat_app_client;
 
+import app.chat_app_client.controller.ChatController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -28,7 +29,7 @@ public class MainStage extends Stage {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(ClientApp.class.getResource(filePath));
             Scene scene = new Scene(fxmlLoader.load());
-            this.setTitle("Server log");
+            this.setTitle("Chat app");
             this.setScene(scene);
         }
         catch (IOException e) {
@@ -59,10 +60,13 @@ public class MainStage extends Stage {
         var result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             this.close();
+            ServerConnection.getInstance().logout();
+            ServerConnection.getInstance().stop();
+            System.exit(0);
         }
     }
 
-    enum ClientScene {
+    public enum ClientScene {
         LOGIN, REGISTER, CHAT
     }
 }
